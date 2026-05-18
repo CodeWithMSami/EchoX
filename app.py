@@ -4,8 +4,10 @@ from utils.database import get_command_prefix
 from dotenv import load_dotenv
 from utils.envs import DISCOR_TOKEN
 
-intents = discord.Intents.default()
+intents = discord.Intents.all()
 intents.message_content = True
+intents.bans = True
+intents.moderation = True
 
 bot = commands.AutoShardedBot(intents=intents, command_prefix=get_command_prefix)
 
@@ -14,6 +16,6 @@ async def on_ready():
     await bot.load_extension("cogs.ai")
     await bot.load_extension("cogs.help")
     await bot.load_extension("cogs.moderation")
-    print(f'{bot.user} is ready!\n')
+    print(f'{bot.user} is ready!')
 
 bot.run(DISCOR_TOKEN)

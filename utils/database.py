@@ -12,17 +12,25 @@ cursor.execute('''
         property TEXT NOT NULL,
         value TEXT NOT NULL,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
+    );
 ''')
 
 def get_command_prefix(*args):
     '''When called it returns the command prefix.'''
-    cursor.execute("SELECT * FROM utility WHERE property = ?", ("prefix",))
+    cursor.execute("SELECT * FROM utility WHERE property = ?;", ("prefix",))
     prefix = cursor.fetchone()
     
     if prefix is None or len(prefix) < 0:
-        cursor.execute("INSERT INTO utility(property, value) VALUES (?, ?)", ("prefix", "!"))
+        cursor.execute("INSERT INTO utility(property, value) VALUES (?, ?);", ("prefix", "!"))
         connection.commit()
         return "!"
     
     return str(prefix["value"])
+
+def set_command_prefix(prefix: str,*args):
+    '''Used to set the prefix.'''
+    if prefix:
+        cursor.execute("UPDATE utility SET value = ? WHERE property = ?;", (prefix, "prefix"))
+        connection.commit()
+        return 1
+    return 0
