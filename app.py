@@ -29,7 +29,7 @@ def start_api():
     uvicorn.run(
         app,
         host="0.0.0.0",
-        port=8000
+        port=12459
     )
 
 
