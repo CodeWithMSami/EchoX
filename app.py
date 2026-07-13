@@ -4,6 +4,11 @@ from utils.database import get_command_prefix
 from dotenv import load_dotenv
 from utils.envs import DISCOR_TOKEN
 
+import asyncio
+import uvicorn
+
+from utils.api import app, set_bot
+
 intents = discord.Intents.all()
 intents.message_content = True
 intents.bans = True
@@ -18,4 +23,22 @@ async def on_ready():
     await bot.load_extension("cogs.moderation")
     print(f'{bot.user} is ready!')
 
-bot.run(DISCOR_TOKEN)
+async def start_api():
+    set_bot(bot)
+
+    config = uvicorn.Config(
+        app,
+        host="0.0.0.0",
+        port=8000
+    )
+
+    server = uvicorn.Server(config)
+    await server.serve()
+
+async def main():
+    await asyncio.gather(
+        bot.start(DISCOR_TOKEN),
+        start_api()
+    )
+
+asyncio.run(main())
