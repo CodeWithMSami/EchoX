@@ -4,8 +4,8 @@ from utils.database import get_command_prefix
 from dotenv import load_dotenv
 from utils.envs import DISCOR_TOKEN
 
-import asyncio
 import uvicorn
+import threading
 
 from utils.api import app, set_bot
 
@@ -23,22 +23,21 @@ async def on_ready():
     await bot.load_extension("cogs.moderation")
     print(f'{bot.user} is ready!')
 
-async def start_api():
+def start_api():
     set_bot(bot)
 
-    config = uvicorn.Config(
+    uvicorn.run(
         app,
         host="0.0.0.0",
         port=8000
     )
 
-    server = uvicorn.Server(config)
-    await server.serve()
 
-async def main():
-    await asyncio.gather(
-        bot.start(DISCOR_TOKEN),
-        start_api()
+if __name__ == "__main__":
+    api_thread = threading.Thread(
+        target=start_api,
+        daemon=True
     )
+    api_thread.start()
 
-asyncio.run(main())
+    bot.run(str(DISCOR_TOKEN))
